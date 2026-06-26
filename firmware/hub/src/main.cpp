@@ -1,27 +1,43 @@
 #include <Arduino.h>
-#include <TFT_eSPI.h>
 
-#include "pins.h"
+#include "display_ui.h"
+#include "heating_controller.h"
 #include "protocol.h"
+#include "readings_store.h"
+#include "web_server.h"
 
-TFT_eSPI tft = TFT_eSPI();
+static unsigned long g_last_display_ms = 0;
+static unsigned long g_last_heat_ms = 0;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(TERMO_RELAY_PIN, OUTPUT);
-  digitalWrite(TERMO_RELAY_PIN, LOW);
-
-  tft.init();
-  tft.setRotation(1);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString("Termostato", 10, 10, 4);
-  tft.drawString(String("API ") + TERMO_API_VERSION, 10, 50, 2);
-  tft.drawString("Relay OFF", 10, 80, 2);
-
   Serial.printf("termostato hub (%s)\n", TERMO_API_VERSION);
+
+  displayInit();
+  readingsInit();
+  heatingInit();
+
+  displayUpdate(heatingSnapshot(millis()), "WiFi...");
+
+  if (!webInit()) {
+    return;
+  }
+
+  displayUpdate(heatingSnapshot(millis()), webIpText());
 }
 
 void loop() {
-  delay(1000);
+  const unsigned long now_ms = millis();
+
+  webLoop();
+
+  if (now_ms - g_last_heat_ms >= 1000UL) {
+    g_last_heat_ms = now_ms;
+    heatingUpdate(now_ms);
+  }
+
+  if (now_ms - g_last_display_ms >= 2000UL) {
+    g_last_display_ms = now_ms;
+    displayUpdate(heatingSnapshot(now_ms), webIpText());
+  }
 }

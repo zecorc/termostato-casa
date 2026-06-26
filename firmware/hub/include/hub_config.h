@@ -1,0 +1,13 @@
+#pragma once
+
+#define TERMO_MAX_SENSORS 8
+
+#define TERMO_DEFAULT_TARGET_C 20.0f
+#define TERMO_DEFAULT_HYSTERESIS_C 0.5f
+
+#define TERMO_SENSOR_TIMEOUT_MS (5UL * 60UL * 1000UL)
+#define TERMO_MIN_BOILER_ON_MS (5UL * 60UL * 1000UL)
+#define TERMO_MIN_BOILER_OFF_MS (3UL * 60UL * 1000UL)
+
+#define TERMO_WIFI_AP_NAME "Termostato-Setup"
+#define TERMO_MDNS_HOSTNAME "termostato"
