@@ -48,6 +48,23 @@ pio run -d firmware/sensor
 
 Or from the repository root: `pio run`
 
+## Test senza hardware
+
+Puoi simulare l'hub sul PC (stessa Web UI e API del firmware ESP32):
+
+```bash
+pip install -r tools/mock_hub/requirements.txt
+python tools/mock_hub/mock_hub.py
+```
+
+Apri http://127.0.0.1:8080/ e, in un altro terminale:
+
+```bash
+python tools/mock_hub/simulate_sensor.py --temp 18.0
+```
+
+Dettagli ed esempi curl: [tools/mock_hub/README.md](tools/mock_hub/README.md).
+
 ## Layout
 
 ```
@@ -55,4 +72,6 @@ firmware/
 ├── hub/      ESP32 — display, relay, web server
 ├── sensor/   ESP32 — room temperature nodes
 └── common/   Shared headers (API protocol)
+tools/
+└── mock_hub/ Mock hub HTTP for testing without ESP32
 ```
